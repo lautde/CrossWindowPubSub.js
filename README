@@ -1,0 +1,9 @@
+= Crosswindow PubSub for Javascript
+
+== Known issues:
+
+* High frequency pubs drop starting at about a 30ms rate on Chrome (see the frequency tests). It works on Firefox 6.
+
+== Dependencies:
+
+* jQuery
