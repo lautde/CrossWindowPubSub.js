@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <title>External window for pubsub QUnit tests</title>
+    <style type="text/css" media="screen">
+      body{ font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif; }
+    </style>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <script type="text/javascript" src="pubsub.js"></script>
+    <script type="text/javascript">// <![CDATA[
+      jQuery(function( $ ) {
+        
+        // OK. Über-ugly. We need this for our tests, because IE8 (9? 10?) can't even pass simple array (like, you know [1,2,3])
+        // as argument of a function call from one window to another in a way that Crocks JSON.stringify understands. WTF!?
+        PubSub.publishJson = function( channel, value ) {
+          this.publish(channel, JSON.parse(value));
+        };
+        
+        opener.window.parent.QUnit.start();
+      });
+    // ]]></script>
+  </head>
+  <body>
+    This window is used by the pubsub QUnit tests. You can safely close it after running the tests.
+  </body>
+</html>
