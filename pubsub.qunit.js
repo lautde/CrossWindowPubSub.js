@@ -1,4 +1,4 @@
-external_window = window.open('external.html', 'externalwindow', 'width=800,height=800,left=0,top=0');
+var external_window = window.open('external.html', 'externalwindow', 'width=400,height=400,left=0,top=0');
 
 window.localStorage.clear();
 
@@ -92,8 +92,8 @@ module( "remote");
       asyncTest('subscribe() with the msg twice', function(){
         var msg = 'test' + Math.random();
         var channel = 'test' + Math.random();
-        external_window.PubSub.publish(channel, msg);
         
+        external_window.PubSub.publish(channel, msg);
         equal(PubSub.value(channel), msg, 'the value is set before the test');
         
         // be sure to subscribe _after_ the first publish.
@@ -128,31 +128,38 @@ module( "remote");
       });
       
       
-      asyncTest('frequenz', function(){
+      asyncTest('frequency', function(){
         var msg = 'test' + Math.random();
         var channel = 'test' + Math.random();
         var pub_counter = 0;
         var sub_counter = 0;
+        var storage_counter = 0;
         var count = 100;
-        var interval = 30;
+        var interval = 5;
+        
+        PubSub.subscribe(channel, function(result){ sub_counter++; });
+        
+        var increaseStorageCounter = function(){ storage_counter++; };
+        if( window.addEventListener ) {
+          window.addEventListener( 'storage', increaseStorageCounter, false );     // For Browsers
+        } else {
+          document.attachEvent( 'onstorage', increaseStorageCounter ); // For IE
+        }
         
         var timer = setInterval(function(){
           pub_counter++;
-          console.log('pub', pub_counter);
+          // console.log('pub', pub_counter);
           external_window.PubSub.publish(channel, 'foo');
-          if(pub_counter == count){
+          if(pub_counter >= count){
             clearInterval(timer);
             setTimeout(function(){
               start();
-              equal(sub_counter, count, 'gets all the messages: '+sub_counter+'/'+count);
-            }, 100);
+              equal(storage_counter, count, 'all storage events are triggered: '+storage_counter+'/'+count+' (interval: '+interval+'ms)');
+              equal(sub_counter, count,     'gets all the messages: '           +sub_counter    +'/'+count+' (interval: '+interval+'ms)');
+            }, 10);
           };
         }, interval);
         
-        PubSub.subscribe(channel, function(result){
-          sub_counter++;
-          console.log('sub', sub_counter);
-        });
       });
 
 
@@ -259,29 +266,37 @@ module('local');
         PubSub.publish(channel2, msg);
       });
       
-      asyncTest('frequenz', function(){
+      asyncTest('frequency', function(){
         var msg = 'test' + Math.random();
         var channel = 'test' + Math.random();
         var pub_counter = 0;
         var sub_counter = 0;
+        var storage_counter = 0;
         var count = 100;
         var interval = 1;
         
+        PubSub.subscribe(channel, function(result){ sub_counter++; });
+        
+        var increaseStorageCounter = function(){ storage_counter++; };
+        if( window.addEventListener ) {
+          window.addEventListener( 'storage', increaseStorageCounter, false );     // For Browsers
+        } else {
+          document.attachEvent( 'onstorage', increaseStorageCounter ); // For IE
+        }
+        
         var timer = setInterval(function(){
           pub_counter++;
+          // console.log('pub', pub_counter);
           PubSub.publish(channel, 'foo');
-          if(pub_counter == count){
+          if(pub_counter >= count){
             clearInterval(timer);
             setTimeout(function(){
               start();
-              equal(sub_counter, count, 'gets all the messages: '+sub_counter+'/'+count);
+              equal(sub_counter, count, 'gets all the messages: '+sub_counter+'/'+count+' (interval: '+interval+'ms)');
             }, 100);
           };
         }, interval);
         
-        PubSub.subscribe(channel, function(result){
-          sub_counter++;
-        });
       });
       
 });

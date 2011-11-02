@@ -82,7 +82,7 @@ jQuery( function($) {
       // Sets the localStorage value with the duplicate buster.
       set: function(channel, value){
         var val = value + Math.floor((Math.random()+1)*100000000000);                    // 12 digit random number
-        console.log('set', channel, value, val);
+        // console.log('set', channel, value, val);
         localStorage.setItem('__pubsub__'+channel, val);
       },
       
@@ -110,7 +110,7 @@ jQuery( function($) {
         
         $.each( PubSub.channels, function( stored_channel, known_content ){
           var storage_content = PubSub.storage.get_raw( stored_channel );
-          console.log('findChangedChannel', stored_channel, known_content, storage_content);
+          // console.log('findChangedChannel', stored_channel, known_content, storage_content);
           
           if( storage_content != known_content ) {
             PubSub.channels[stored_channel] = storage_content;
@@ -125,7 +125,7 @@ jQuery( function($) {
       // Wraps the storage event to trigger our custom event (see above) if something changes we know of.
       eventHandler: function() {
         var channel = PubSub.storage.findChangedChannel();
-        console.log('eventHandler', channel);
+        // console.log('eventHandler', channel);
         
         if(!channel) { return false; }
         
@@ -136,14 +136,11 @@ jQuery( function($) {
     
   };
   
+  // Attache to the storage event.
   if( window.addEventListener ) {
-    window.addEventListener( 'storage', PubSub.storage.eventHandler, false );     // Fuer Firefox, Chrome, Safari und Opera
+    window.addEventListener( 'storage', PubSub.storage.eventHandler, false ); // For browsers
   } else {
-    // IE triggert erst Event, macht dann den Storage-Eintrag.
-    // Durch den timeout stellen wir sicher, dass der Storage-Eintrag da ist, wenn das Event feuert.
-    document.attachEvent( 'onstorage', function(e){
-      setTimeout( function(){PubSub.storage.eventHandler(e); }, 0) ;
-    });
+    document.attachEvent( 'onstorage', function(){setTimeout(PubSub.storage.eventHandler, 0);} ); // For IE
   }
   
 });

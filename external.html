@@ -10,14 +10,12 @@
     <script type="text/javascript" src="pubsub.js"></script>
     <script type="text/javascript">// <![CDATA[
       jQuery(function( $ ) {
-        
-        // OK. Über-ugly. We need this for our tests, because IE8 (9? 10?) can't even pass simple array (like, you know [1,2,3])
-        // as argument of a function call from one window to another in a way that Crocks JSON.stringify understands. WTF!?
+        // Crockfords JSON serializer fails on arrays after they're transported from one window to another in IE8 (9? 10?).
         PubSub.publishJson = function( channel, value ) {
           this.publish(channel, JSON.parse(value));
         };
         
-        opener.window.parent.QUnit.start();
+        if(opener.window.parent && typeof opener.window.parent.QUnit != 'undefined'){ opener.window.parent.QUnit.start(); }
       });
     // ]]></script>
   </head>
